@@ -21,7 +21,7 @@ import org.sunbird.sync.TelemetrySyncOperation;
 
 import java.util.Locale;
 
-import io.fabric.sdk.android.Fabric;
+// import io.fabric.sdk.android.Fabric;
 
 
 /**
