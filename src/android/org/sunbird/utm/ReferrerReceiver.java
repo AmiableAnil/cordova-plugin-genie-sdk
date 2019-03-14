@@ -18,7 +18,6 @@ import java.net.URLDecoder;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
-
 public class ReferrerReceiver extends BroadcastReceiver {
 
     private static final String TAG = "ReferrerReceiver";
@@ -27,15 +26,11 @@ public class ReferrerReceiver extends BroadcastReceiver {
     private static final String UTM_SOURCE = "utm_source";
     private static final String UTM_MEDIUM = "utm_medium";
     private static final String UTM_TERM = "utm_term";
-    private static final String UTM_CONTENT = "utm_content"; 
+    private static final String UTM_CONTENT = "utm_content";
 
-
-    private final String[] sources = {
-            UTM_CAMPAIGN, UTM_SOURCE, UTM_MEDIUM, UTM_TERM, UTM_CONTENT
-    };
+    private final String[] sources = { UTM_CAMPAIGN, UTM_SOURCE, UTM_MEDIUM, UTM_TERM, UTM_CONTENT };
 
     public static JSONObject utmInfo = new JSONObject();
-
 
     private static Map<String, String> getHashMapFromQuery(String query) throws UnsupportedEncodingException {
 
@@ -44,7 +39,8 @@ public class ReferrerReceiver extends BroadcastReceiver {
         String[] pairs = query.split("&");
         for (String pair : pairs) {
             int idx = pair.indexOf("=");
-            query_pairs.put(URLDecoder.decode(pair.substring(0, idx), "UTF-8"), URLDecoder.decode(pair.substring(idx + 1), "UTF-8"));
+            query_pairs.put(URLDecoder.decode(pair.substring(0, idx), "UTF-8"),
+                    URLDecoder.decode(pair.substring(idx + 1), "UTF-8"));
         }
 
         return query_pairs;
@@ -53,16 +49,14 @@ public class ReferrerReceiver extends BroadcastReceiver {
     @Override
     public void onReceive(Context context, Intent intent) {
         Bundle extras = intent.getExtras();
-
-
         if (extras == null) {
             return;
         }
 
         String referrerString = extras.getString("referrer");
 
-        //LogUtil.i(TAG, "referrerString: " + referrerString);
-        if (referrerString != null || referrerString.length() != 0) {
+        // LogUtil.i(TAG, "referrerString: " + referrerString);
+        if (referrerString != null && referrerString.length() > 0) {
 
             try {
                 Map<String, String> getParams = getHashMapFromQuery(referrerString);
@@ -92,25 +86,24 @@ public class ReferrerReceiver extends BroadcastReceiver {
                     Gson gson = new Gson();
                     String info = gson.toJson(utmData);
                     try {
-                        utmInfo.put("actionType","utmInfo");
-                        utmInfo.put("utmInformation",info);
+                        utmInfo.put("actionType", "utmInfo");
+                        utmInfo.put("utmInformation", info);
                         EventBus.postEvent(new GenericEvent(utmInfo.toString()));
                     } catch (JSONException e) {
                         e.printStackTrace();
                     }
                 }
-                //        TODO: (s)to be implemented
-//                TelemetryHandler.saveTelemetry(TelemetryBuilder.buildGEUpdate(utmData));
+                // TODO: (s)to be implemented
+                // TelemetryHandler.saveTelemetry(TelemetryBuilder.buildGEUpdate(utmData));
 
             } catch (UnsupportedEncodingException e) {
-                //LogUtil.e(TAG, "Referrer Error: " + e.getMessage());
+                // LogUtil.e(TAG, "Referrer Error: " + e.getMessage());
             } finally {
                 // Pass along to google
                 CampaignTrackingReceiver receiver = new CampaignTrackingReceiver();
                 receiver.onReceive(context, intent);
             }
         }
-
     }
 
 }
